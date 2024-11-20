@@ -1,0 +1,249 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_ITEMS 100
+#define MAX_TENTATIVAS 3  // Número máximo de tentativas de login
+
+typedef struct {
+    char nome[50];
+    float preco;
+    int quantidade;
+    char tipo[30];
+} Item;
+
+Item estoque[MAX_ITEMS];
+int totalItems = 0;
+float fluxoCaixa = 0.0;
+
+// Função de login
+int login() {
+    char usuario[50], senha[50];
+    char usuario_correto[] = "admin";
+    char senha_correta[] = "12345";
+    int tentativas = 0;
+
+    while (tentativas < MAX_TENTATIVAS) {
+        printf("Tentativa de acesso %d/%d\n", tentativas + 1, MAX_TENTATIVAS);
+        
+        printf("Digite o nome de usuario: ");
+        scanf(" %[^\n]", usuario);  // Espaco para permitir espacos no nome de usuario
+        
+        printf("Digite a senha: ");
+        scanf(" %[^\n]", senha);  // Espaco para permitir espacos na senha
+
+        // Verifica as credenciais
+        if (strcmp(usuario, usuario_correto) == 0 && strcmp(senha, senha_correta) == 0) {
+            printf("Acesso permitido! Bem-vindo ao sistema.\n");
+            return 1;  // Acesso permitido
+        } else {
+            printf("Acesso negado! Usuario ou senha incorretos.\n");
+            tentativas++;
+        }
+    }
+
+    printf("Número máximo de tentativas atingido. Acesso bloqueado.\n");
+    return 0;  // Acesso negado após 3 tentativas
+}
+
+void listarTipos() {
+    printf("\nTipos de Produtos Disponíveis:\n");
+    printf("1: Frutas\n");
+    printf("2: Legumes\n");
+    printf("3: Verduras\n");
+    printf("4: Orgânicos\n");
+    printf("5: Voltar\n");
+    printf("Escolha um tipo: ");
+}
+
+void adicionarItem() {
+    if (totalItems >= MAX_ITEMS) {
+        printf("Estoque cheio! Não é possível adicionar mais itens.\n");
+        return;
+    }
+
+    Item novoItem;
+
+    while (1) {  // Laço para permitir que o usuário volte, se necessário
+        listarTipos();
+        int tipoEscolhido;
+        scanf("%d", &tipoEscolhido);
+
+        // Se o usuário escolher "Voltar"
+        if (tipoEscolhido == 5) {
+            printf("Voltando ao menu principal...\n");
+            return;  // Sai da função e volta para o menu principal
+        }
+
+        switch (tipoEscolhido) {
+            case 1:
+                strcpy(novoItem.tipo, "Frutas");
+                break;
+            case 2:
+                strcpy(novoItem.tipo, "Legumes");
+                break;
+            case 3:
+                strcpy(novoItem.tipo, "Verduras");
+                break;
+            case 4:
+                strcpy(novoItem.tipo, "Orgânicos");
+                break;
+            default:
+                printf("Tipo inválido! Tente novamente.\n");
+                continue;  // Se o tipo for inválido, continua o laço e pede novamente a escolha
+        }
+
+        printf("Digite o nome do produto: ");
+        scanf(" %[^\n]", novoItem.nome);
+        printf("Digite o preço do produto: ");
+        scanf("%f", &novoItem.preco);
+        printf("Digite a quantidade do produto: ");
+        scanf("%d", &novoItem.quantidade);
+
+        fluxoCaixa -= novoItem.preco * novoItem.quantidade;
+
+        estoque[totalItems] = novoItem;
+        totalItems++;
+        printf("Produto '%s' do tipo '%s' adicionado com sucesso!\n", novoItem.nome, novoItem.tipo);
+        printf("Saldo atualizado: R$ %.2f\n", fluxoCaixa);
+        break;  // Sai do laço quando o produto for adicionado com sucesso
+    }
+}
+
+void listarItems() {
+    printf("\n");
+    printf("+-------------------------------------+\n");
+    printf("|              Estoque                |\n");
+    printf("+-------------------------------------+\n");
+    printf("|   Nome   |   Preço   |  Quantidade  |   Tipo    |\n");
+    printf("+-------------------------------------+\n");
+    for (int i = 0; i < totalItems; i++){
+        printf("|  %-12s   |  R$ %.2f  |    %-10d     |  %-10s |\n", 
+               estoque[i].nome, estoque[i].preco, estoque[i].quantidade, estoque[i].tipo);
+    }
+    printf("+-------------------------------------+\n");
+    printf("Saldo atual: R$ %.2f\n", fluxoCaixa);
+}
+
+void venderProduto() {
+    char nome[50];
+    printf("Digite o nome do produto que deseja vender: ");
+    scanf(" %[^\n]", nome);
+
+    for (int i = 0; i < totalItems; i++) {
+        if (strcmp(estoque[i].nome, nome) == 0) {
+            int quantidadeVendida;
+            printf("Digite a quantidade a ser vendida: ");
+            scanf("%d", &quantidadeVendida);
+
+            if (quantidadeVendida > estoque[i].quantidade) {
+                printf("Quantidade insuficiente em estoque!\n");
+            } else {
+                estoque[i].quantidade -= quantidadeVendida;
+
+                // Calculando o preço de venda com o aumento de 20%
+                float valorVenda = estoque[i].preco * 1.2 * quantidadeVendida;
+
+                fluxoCaixa += valorVenda;
+
+                printf("Produto '%s' vendido! Quantidade: %d. Total da venda: R$ %.2f.\n", 
+                       estoque[i].nome, quantidadeVendida, valorVenda);
+                printf("Saldo atualizado: R$ %.2f\n", fluxoCaixa);
+            }
+            return;
+        }
+    }
+    printf("Item '%s' não encontrado no estoque.\n", nome);
+}
+
+void retirarItem() {
+    char nome[50];
+    printf("Digite o nome do produto a ser retirado: ");
+    scanf(" %[^\n]", nome);
+
+    for (int i = 0; i < totalItems; i++) {
+        if (strcmp(estoque[i].nome, nome) == 0) {
+            int quantidadeRetirada;
+            printf("Digite a quantidade a ser retirada: ");
+            scanf("%d", &quantidadeRetirada);
+
+            if (quantidadeRetirada > estoque[i].quantidade) {
+                printf("Quantidade insuficiente em estoque!\n");
+            } else {
+                estoque[i].quantidade -= quantidadeRetirada;
+
+                printf("Produto '%s' retirado! Quantidade: %d. Quantidade restante: %d.\n", 
+                       estoque[i].nome, quantidadeRetirada, estoque[i].quantidade);
+            }
+            return;
+        }
+    }
+    printf("Item '%s' não encontrado no estoque.\n", nome);
+}
+
+void adicionarSaldo() {
+    float saldoAdicional;
+    printf("Digite o valor que deseja adicionar ao saldo: R$ ");
+    scanf("%f", &saldoAdicional);
+
+    if (saldoAdicional > 0) {
+        fluxoCaixa += saldoAdicional;
+        printf("Saldo de R$ %.2f adicionado com sucesso!\n", saldoAdicional);
+    } else {
+        printf("Valor inválido! O valor deve ser maior que zero.\n");
+    }
+
+    printf("Saldo atualizado: R$ %.2f\n", fluxoCaixa);
+}
+
+void menu() {
+    int opcao;
+    do {
+        printf("\n");
+        printf("+----------------------------+\n");
+        printf("|       EcoGro Control       |\n");
+        printf("+----------------------------+\n");
+        printf("| 1: Cadastrar Produto       |\n");
+        printf("| 2: Consultar Estoque       |\n");
+        printf("| 3: Vender produto          |\n");
+        printf("| 4: Retirar Produto         |\n");
+        printf("| 5: Adicionar Saldo         |\n");
+        printf("| 6: Sair                    |\n");
+        printf("+----------------------------+\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                adicionarItem();
+                break;
+            case 2:
+                listarItems();
+                break;
+            case 3:
+                venderProduto();
+                break;
+            case 4:
+                retirarItem();
+                break;
+            case 5:
+                adicionarSaldo();
+                break;
+            case 6:
+                printf("Saindo do sistema...\n");
+                printf("Saldo final: R$ %.2f\n", fluxoCaixa);
+                break;
+            default:
+                printf("Opção inválida! Tente novamente.\n");
+        }
+    } while (opcao != 6);
+}
+
+int main() {
+    // Tenta o login
+    if (login()) {
+        menu();
+    }
+
+    return 0;
+}
