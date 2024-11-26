@@ -205,10 +205,11 @@ void menu() {
         printf("+----------------------------+\n");
         printf("| 1: Cadastrar Produto       |\n");
         printf("| 2: Consultar Estoque       |\n");
-        printf("| 3: Vender produto          |\n");
-        printf("| 4: Retirar Produto         |\n");
+        printf("| 3: Vender Produto          |\n");
+        printf("| 4: Fluxo de Caixa          |\n");
         printf("| 5: Adicionar Saldo         |\n");
-        printf("| 6: Sair                    |\n");
+        printf("| 6: Relatório de Doação     |\n");
+        printf("| 7: Sair                    |\n");
         printf("+----------------------------+\n");
         printf("Escolha uma opção: ");
         scanf("%d", &opcao);
@@ -230,13 +231,17 @@ void menu() {
                 adicionarSaldo();
                 break;
             case 6:
+                printf("Relatório de Doação\n");
+                // Lógica para Relatório de Doação
+                break;
+            case 7:
                 printf("Saindo do sistema...\n");
                 printf("Saldo final: R$ %.2f\n", fluxoCaixa);
                 break;
             default:
                 printf("Opção inválida! Tente novamente.\n");
         }
-    } while (opcao != 6);
+    } while (opcao != 7); // Modificado para sair quando a opção for 7
 }
 
 int main() {
